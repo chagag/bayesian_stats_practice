@@ -4,7 +4,7 @@ output: html_notebook
 author: "Amit Goldenberg"
 ---
 
-Stanford students were asked about their happiness.
+Stanford students were asked about their happiness and a few other measures.
 
 ####Scales:
 **Expct happiness(Amit Invented)- 1-7 scale**
@@ -152,6 +152,14 @@ d <- read_csv("hapiness_data.csv")
 
 
 ```
+
+
+```{r descriptives}
+
+table (d$gender)
+
+```
+
 
 
 
