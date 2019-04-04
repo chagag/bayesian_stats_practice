@@ -1,0 +1,175 @@
+---
+title: "Hapiness Study"
+output: html_notebook
+author: "Amit Goldenberg"
+---
+
+Stanford students were asked about their happiness.
+
+####Scales:
+**Expct happiness(Amit Invented)- 1-7 scale**
+
+Expecting happy emotions:
+1.	I nearly always expect to feel happy.
+2.	I rarely expect to feel happy. 
+3.	In most situations, I expect to feel happy.
+4.	I feel surprised whenever I feel happy.
+
+
+Not expecting unhappy emotions:
+1.	I nearly always expect to feel unhappy.
+2.	I rarely expect to feel unhappy. 
+3.	In most situations, I expect to feel unhappy.
+4.	I feel surprised whenever I feel unhappy.
+
+
+**Value Happiness (Iris Mauss) - 1-7 scale**
+
+1.	How happy I am at any given moment says a lot about how worthwhile my life is.
+2.	If I don't feel happy, maybe there is something wrong with me.
+3.	I value things in life only to the extent that they influence my personal happiness.
+4.	I would like to be happier than I generally am.
+5.	Feeling happy is extremely important to me.
+6.	I am concerned about my happiness even when I feel happy.
+7.	To have a meaningful life, I need to feel happy most of the time.
+
+**Satisfaction with Life (SWL): 1-7 scale**
+
+1. In most ways my life is close to ideal.
+2. The conditions of my life are excellent.
+3. I am satisfied with my life.
+4. So far I have gotten the important things I want in life.
+5. If I could live my life over, I would change almost nothing.
+
+
+**Ryff Scales of Psychological Well-Being: 1-6 scale**
+
+1. I tend to be influenced by people with strong opinions.
+2. I live life one day at a time and don't really think about the future.
+3. For me, life has been a continuous process of learning, changing, and growth.
+4. In many ways, I feel disappointed about my achievements in life.
+5. The demands of everyday life often get me down.
+6. I sometimes feel as if I've done all there is to do in life.
+7. I judge myself by what I think is important, not by the values of what others think is important.
+8. I have not experienced many warm and trusting relationships with others.
+9. I like most aspects of my personality.
+10. I have confidence in my opinions, even if they are contrary to the general consensus.
+11. Some people wander aimlessly through life, but I am not one of them.
+12. I think it is important to have new experiences that challenge how you think about yourself and the world.
+13. Maintaining close relationships has been difficult and frustrating for me.
+14. When I look at the story of my life, I am pleased with how things have turned out.
+15. People would describe me as a giving person, willing to share my time with others.
+16. In general, I feel I am in charge of the situation in which I live.
+17. I am quite good at managing the many responsibilities of my daily life.
+18. I gave up trying to make big improvements or changes in my life a long time ago.
+
+**BDI**
+Depression - Bdi 
+1.
+I do not feel sad.
+I feel sad or blue.
+I am blue or sad all the time and I can't snap out of it.
+I am so sad or unhappy that I can't stand it.
+2.
+I do not feel that the future is hopeless and that things cannot improve.
+I feel discouraged about the future.
+I feel I have nothing to look forward to.
+I feel that the future is hopeless and that things cannot improve.
+3.
+I do not feel like a failure.
+I feel I have failed more than the average person.
+As I look back on my life, all I can see is a lot of failures.
+I feel I am a complete failure as a person (parent, husband, wife).
+4.
+I am not particularly dissatisfied.
+I don't enjoy things the way I used to.
+I don't get real satisfaction out of anything anymore.
+I am dissatisfied with everything.
+5.
+I don't feel particularly guilty.
+I feel bad or unworthy a good part of the time.
+I feel quite guilty.
+I feel as though I am very bad or worthless.
+6.
+I don't feel disappointed in myself.
+I am disappointed in myself.
+I am disgusted with myself.
+I hate myself.
+7.
+I have not lost interest in other people.
+I am less interested in other people than I used to be.
+I have lost most of my interest in other people and have little feeling for them.
+I have lost all of my interest in other people and don't care about them at all.
+8.
+I make decisions about as well as ever.
+I try to put off making decisions.
+I have great difficulty in making decisions.
+I can't make any decisions at all anymore.
+9.
+I don't feel that I look any worse than I used to.
+I am worried that I am looking old or unattractive.
+I feel that there are permanent changes in my appearance that make me look unattractive.
+I believe that I am ugly or repulsive-looking.
+
+10.
+I don't get more tired than usual.
+I get tired more easily than I used to.
+I get tired from doing almost anything.
+I am too tired to do anything.
+11.
+I can work about as well as before.
+It takes an extra effort to get started at doing something.
+I have to push myself very hard to do anything.
+I can't do any work at all.
+12.
+My appetite is no worse than usual.
+My appetite is not as good as it used to be.
+My appetite is much worse now.
+I have no appetite at all anymore.
+
+**Depression -  CES: **
+			
+0 = Rarely or none of the time (less than 1 day)
+1 = Some or a little of the time (1-2 days)
+2 = Occasionally or moderate amount of time (3-4 days)
+3 = Most or all of the time (5-7 days)
+
+1.	I felt depressed.
+2.	My sleep was restless.			
+3.	I felt lonely.
+4.	I had crying spells.
+5.	I could not 'get going.'
+			
+
+
+
+# Reads in the data file
+```{r setup, , include=FALSE,echo=FALSE}
+
+library(tidyverse);library(rethinking)
+
+d <- read_csv("hapiness_data.csv")
+
+
+```
+
+
+
+**correlation table**
+```{r correlation table}
+
+
+cor_table = data.frame (d$expectScale, d$valueScale ,d$swlScale, d$ryffScale, d$bdiScale, d$cesScale)
+
+
+colnames(cor_table) <- c("expect", "value", "swl", "ryff", "bdi" , "ces"  )
+
+cor_table1 = cor(cor_table)
+cor_table_round = round(cor_table1, digits = 2)
+
+
+cor_table_round
+
+
+```
+
