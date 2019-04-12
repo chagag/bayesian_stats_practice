@@ -144,13 +144,14 @@ I have no appetite at all anymore.
 
 
 # Reads in the data file
-```{r setup, , include=FALSE,echo=FALSE}
+```{r ddd , include=FALSE,echo=FALSE}
 
-library(tidyverse);library(rethinking)
+library(tidyverse);library(brms)
 
 d <- read_csv("hapiness_data.csv")
 
-
+ds=d %>%
+  mutate_if (is.numeric,scale)
 ```
 
 
@@ -179,5 +180,50 @@ cor_table_round = round(cor_table1, digits = 2)
 cor_table_round
 
 
+
+
 ```
+
+```{r}
+
+b1 <- 
+  brm(data = ds, family = gaussian,
+      swlScale ~ 1 + valueScale,
+      prior = c(prior(normal(10, 10), class = Intercept),
+                prior(normal(0, 1), class = b),
+                prior(uniform(0, 10), class = sigma)), #this is the sigma for the outcome 
+      iter = 2000, warmup = 500, chains = 4, cores = 4)
+
+print(b1)
+plot(b1)
+
+what you want to see:
+  1. you want tosee them overlaying on  top of each other. 
+  2. 
+```
+**a frequentist confidnce interval** - if we drew 100 similar samples with the same procedure, 95 you would get the same estimate
+
+**a Bayesian credible intervale** - Your confidence that the parameter lies within that interval. 
+
+
+We are changing the prior on the sigma valuation to be exponential
+```{r}
+
+b2 <- 
+  brm(data = ds, family = gaussian,
+      swlScale ~ 1 + valueScale,
+      prior = c(prior(normal(0, 1), class = Intercept),
+                prior(normal(0, 1), class = b),
+                prior(exponential(1), class = sigma)),
+      iter = 2000, warmup = 500, chains = 4, cores = 4)
+
+print(b2)
+
+```
+get sample distributions of the data
+```{r}
+post = posterior_samples(b1) ;post
+
+```
+
 
