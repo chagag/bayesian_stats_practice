@@ -19,7 +19,9 @@ library("cowplot")
 library("brms")
 library(MuMIn) # calculate R-squared for glm
 
-load("data/workspace_fyp_study2.Rdata")
+# load("data/workspace_fyp_study2.Rdata")
+
+load("df.er_psg.Rdata")
 ```
 
 ## Frequentist linear mixed effects models
@@ -48,7 +50,7 @@ lmerTest::lmer(scale(watch_val_rating) ~ scale(psg_tst)*scale(intensity_num) +
 mod_tst3 <- lmer(watch_arou_rating ~ psg_tst*intensity_num +
                    (1+intensity_num|participant),
                data = df.er_psg)
-# r.squaredGLMM(mod_tst4)
+# r.squaredGLMM(mod_tst3)
 
 # mod_tst3c <- lmer(watch_arou_rating ~ psg_tst + intensity_num +
 #                     (1+intensity_num|participant), 
@@ -195,6 +197,31 @@ print(mod_tst1_brm_prior)
 
 # check the default prior
 prior_summary(mod_tst1_brm_prior)
+
+
+
+
+mod_tst2_brm_prior <- brm(scale(watch_arou_rating) ~ scale(psg_tst)*scale(intensity_num) + 
+                      (1+scale(intensity_num)|participant), 
+                      data = df.er_psg %>% filter(!is.na(psg_tst)),
+                      prior = c(
+                        prior(normal(0, 1), class = "b", coef = "scalepsg_tst"),
+                        prior(normal(0, 1), class = "b", coef = "scaleintensity_num"),
+                        prior(normal(0, 1), class = "b", coef = "scalepsg_tst:scaleintensity_num"),
+                        # prior(lkj(1), class = "cor"),
+                        prior(normal(0, 1), class = "Intercept"),
+                        prior(cauchy(0, 1), class = "sd")
+                      ),
+                      family = gaussian,
+               save_all_pars = T,
+               file = "tst2_brm_prior",
+               iter = 2000, warmup = 500, chains = 4, cores = 2)
+#mod_tst1_brm_prior %>% plot(N = 6)
+# posterior_summary(mod_tst2_brm_prior)[1:8,] %>% round(digits =  4)
+print(mod_tst2_brm_prior)
+
+# check the default prior
+prior_summary(mod_tst2_brm_prior)
 ```
 
 ### plot the models
