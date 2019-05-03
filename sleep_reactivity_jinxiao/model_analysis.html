@@ -206,7 +206,9 @@ library(&quot;cowplot&quot;)
 library(&quot;brms&quot;)
 library(MuMIn) # calculate R-squared for glm
 
-load(&quot;data/workspace_fyp_study2.Rdata&quot;)</code></pre>
+load(&quot;data/workspace_fyp_study2.Rdata&quot;)
+
+# load(&quot;df.er_psg.Rdata&quot;)</code></pre>
 </div>
 <div id="frequentist-linear-mixed-effects-models" class="section level2">
 <h2>Frequentist linear mixed effects models</h2>
@@ -269,7 +271,7 @@ lmerTest::lmer(scale(watch_val_rating) ~ scale(psg_tst)*scale(intensity_num) +
 <pre class="r"><code>mod_tst3 &lt;- lmer(watch_arou_rating ~ psg_tst*intensity_num +
                    (1+intensity_num|participant),
                data = df.er_psg)
-# r.squaredGLMM(mod_tst4)
+# r.squaredGLMM(mod_tst3)
 
 # mod_tst3c &lt;- lmer(watch_arou_rating ~ psg_tst + intensity_num +
 #                     (1+intensity_num|participant), 
@@ -752,6 +754,89 @@ print(mod_tst1_brm_prior)</code></pre>
 ## scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <pre class="r"><code># check the default prior
 prior_summary(mod_tst1_brm_prior)</code></pre>
+<pre><code>##                   prior     class                            coef
+## 1                               b                                
+## 2          normal(0, 1)         b              scaleintensity_num
+## 3          normal(0, 1)         b                    scalepsg_tst
+## 4          normal(0, 1)         b scalepsg_tst:scaleintensity_num
+## 5          normal(0, 1) Intercept                                
+## 6  lkj_corr_cholesky(1)         L                                
+## 7                               L                                
+## 8          cauchy(0, 1)        sd                                
+## 9                              sd                                
+## 10                             sd                       Intercept
+## 11                             sd              scaleintensity_num
+## 12  student_t(3, 0, 10)     sigma                                
+##          group resp dpar nlpar bound
+## 1                                   
+## 2                                   
+## 3                                   
+## 4                                   
+## 5                                   
+## 6                                   
+## 7  participant                      
+## 8                                   
+## 9  participant                      
+## 10 participant                      
+## 11 participant                      
+## 12</code></pre>
+<pre class="r"><code>mod_tst2_brm_prior &lt;- brm(scale(watch_arou_rating) ~ scale(psg_tst)*scale(intensity_num) + 
+                      (1+scale(intensity_num)|participant), 
+                      data = df.er_psg %&gt;% filter(!is.na(psg_tst)),
+                      prior = c(
+                        prior(normal(0, 1), class = &quot;b&quot;, coef = &quot;scalepsg_tst&quot;),
+                        prior(normal(0, 1), class = &quot;b&quot;, coef = &quot;scaleintensity_num&quot;),
+                        prior(normal(0, 1), class = &quot;b&quot;, coef = &quot;scalepsg_tst:scaleintensity_num&quot;),
+                        # prior(lkj(1), class = &quot;cor&quot;),
+                        prior(normal(0, 1), class = &quot;Intercept&quot;),
+                        prior(cauchy(0, 1), class = &quot;sd&quot;)
+                      ),
+                      family = gaussian,
+               save_all_pars = T,
+               file = &quot;tst2_brm_prior&quot;,
+               iter = 2000, warmup = 500, chains = 4, cores = 2)
+#mod_tst1_brm_prior %&gt;% plot(N = 6)
+# posterior_summary(mod_tst2_brm_prior)[1:8,] %&gt;% round(digits =  4)
+print(mod_tst2_brm_prior)</code></pre>
+<pre><code>##  Family: gaussian 
+##   Links: mu = identity; sigma = identity 
+## Formula: scale(watch_arou_rating) ~ scale(psg_tst) * scale(intensity_num) + (1 + scale(intensity_num) | participant) 
+##    Data: df.er_psg %&gt;% filter(!is.na(psg_tst)) (Number of observations: 248) 
+## Samples: 4 chains, each with iter = 2000; warmup = 500; thin = 1;
+##          total post-warmup samples = 6000
+## 
+## Group-Level Effects: 
+## ~participant (Number of levels: 62) 
+##                                   Estimate Est.Error l-95% CI u-95% CI
+## sd(Intercept)                         0.66      0.06     0.55     0.80
+## sd(scaleintensity_num)                0.26      0.03     0.21     0.33
+## cor(Intercept,scaleintensity_num)     0.79      0.08     0.62     0.91
+##                                   Eff.Sample Rhat
+## sd(Intercept)                            915 1.00
+## sd(scaleintensity_num)                  1471 1.00
+## cor(Intercept,scaleintensity_num)       1882 1.00
+## 
+## Population-Level Effects: 
+##                                 Estimate Est.Error l-95% CI u-95% CI
+## Intercept                           0.00      0.09    -0.17     0.18
+## scalepsg_tst                        0.15      0.09    -0.02     0.33
+## scaleintensity_num                  0.64      0.04     0.57     0.72
+## scalepsg_tst:scaleintensity_num     0.07      0.04    -0.00     0.15
+##                                 Eff.Sample Rhat
+## Intercept                              657 1.00
+## scalepsg_tst                           729 1.00
+## scaleintensity_num                    1041 1.00
+## scalepsg_tst:scaleintensity_num       1102 1.00
+## 
+## Family Specific Parameters: 
+##       Estimate Est.Error l-95% CI u-95% CI Eff.Sample Rhat
+## sigma     0.28      0.02     0.24     0.31       2050 1.00
+## 
+## Samples were drawn using sampling(NUTS). For each parameter, Eff.Sample 
+## is a crude measure of effective sample size, and Rhat is the potential 
+## scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
+<pre class="r"><code># check the default prior
+prior_summary(mod_tst2_brm_prior)</code></pre>
 <pre><code>##                   prior     class                            coef
 ## 1                               b                                
 ## 2          normal(0, 1)         b              scaleintensity_num
